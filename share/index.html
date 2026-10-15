@@ -19,7 +19,7 @@ button{width:100%;min-height:44px;padding:14px;font-size:17px;background:#c4561f
 button.secondary{background:#1f5f4a;margin-top:10px}
 .fallback{margin-top:16px}
 a.action{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;margin-top:10px;padding:12px 16px;background:#1f5f4a;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;font-size:17px}
-a.action[hidden]{display:none}
+button[hidden],a.action[hidden]{display:none}
 .back{text-align:center;font-size:15px}
 .back a{color:#1f5f4a}
 </style>
@@ -33,7 +33,7 @@ a.action[hidden]{display:none}
 <div class="card">
 <button type="button" id="share-btn">Share</button>
 <div class="fallback" id="fallback">
-<label for="share-url">Link</label>
+<label for="share-url" id="link-label">Link to the Taranaki Funding signup page</label>
 <input id="share-url" type="text" readonly value="https://woodyhere1991.github.io/taranaki-funding/">
 <button type="button" class="secondary" id="copy-btn">Copy link</button>
 <a class="action" id="facebook" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwoodyhere1991.github.io%2Ftaranaki-funding%2F" target="_blank" rel="noopener">Share on Facebook</a>
@@ -64,12 +64,13 @@ a.action[hidden]{display:none}
   };
 
   var param = new URLSearchParams(window.location.search).get("r");
-  var key = (param || "").toLowerCase();
+  var key = (param || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   var region = regions[key] || regions.taranaki;
   var text = "Free weekly email listing " + region.name + " grant deadlines for clubs, schools, marae and community groups.";
 
   document.title = "Share " + region.brand;
   document.getElementById("heading").textContent = "Share " + region.brand;
+  document.getElementById("link-label").textContent = "Link to the " + region.brand + " signup page";
 
   var urlInput = document.getElementById("share-url");
   urlInput.value = region.url;
@@ -121,7 +122,9 @@ a.action[hidden]{display:none}
     if (legacyCopy()) markCopied();
   });
 
-  document.getElementById("share-btn").addEventListener("click", function () {
+  var shareBtn = document.getElementById("share-btn");
+  if (typeof navigator.share !== "function") shareBtn.hidden = true;
+  shareBtn.addEventListener("click", function () {
     if (typeof navigator.share !== "function") {
       showFallback();
       return;
