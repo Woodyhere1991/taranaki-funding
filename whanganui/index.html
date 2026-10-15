@@ -79,7 +79,8 @@ form{position:relative}.hp{position:absolute;left:-9999px;width:1px;height:1px;o
       if (!el.name || el.type === 'checkbox' || el.type === 'submit' || el.type === 'button') return;
       params.append(el.name, el.value);
     });
-    fetch(form.action, {
+    var endpoint = form.action + (form.action.indexOf('?') === -1 ? '?' : '&') + 'isAjax=1';
+    fetch(endpoint, {
       method: 'POST',
       mode: 'cors',
       headers: {
@@ -88,11 +89,19 @@ form{position:relative}.hp{position:absolute;left:-9999px;width:1px;height:1px;o
       },
       body: params
     }).then(function (response) {
+      if (response.redirected) {
+        window.location.href = 'thank-you.html';
+        return;
+      }
       return response.text().then(function (text) {
         var data;
         try {
           data = JSON.parse(text);
         } catch (err) {
+          if (response.ok) {
+            window.location.href = 'thank-you.html';
+            return;
+          }
           showError(failText);
           return;
         }
