@@ -12,3 +12,5 @@ Region pages:
 - https://nzgrants.org/share/?r=<region> (`taranaki`, `whanganui`, or `manawatu`)
 
 The root `index.html`, `thank-you.html` and `sample.html` redirect stubs must stay permanently, because invites already sent link to the old root.
+
+Custom domain served over HTTPS (Enforce HTTPS on).
