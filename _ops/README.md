@@ -32,7 +32,9 @@ The account had no newsletter campaigns before this repair. Prepared and saved t
 
 The original Manawatu issue was referenced in Grok's remote workspace but its text was not present in GitHub, Brevo or the locally saved chat. The replacement `manawatu/sample.html` was rebuilt from current primary funder sources, with venue and council boundaries checked. It is not a recovered copy of Grok's original.
 
-Still required: review all final content and audiences with the owner, then obtain explicit send/schedule approval and record the actual saved schedule. The unsubscribe placeholder is present in the saved draft previews; replacement in a real delivered email has not been tested. No send, schedule, test-signup, contact modification, confirmation-email trigger, authentication change or Grok routine restart was performed. Website tests mock every signup request.
+The owner explicitly approved Monday-morning scheduling on 17 October. Final saved content, regional senders, recipient totals and unsubscribe placeholders were checked. Brevo now confirms all three campaigns as **Scheduled for Monday 19 October 2026 at 09:00 Pacific/Auckland (NZDT, UTC+13)**, equivalent to 18 October at 20:00 UTC: Taranaki #8 (7 recipients), Whanganui #9 (3), Manawatu #10 (1). These are one-off issue schedules, not recurring weekly campaigns. Do not create duplicates or edit a scheduled campaign without a new reason.
+
+Still pending: actual delivery/bounce results after sending, and verification of the unsubscribe URL in a received email. The documented placeholder is present in every saved campaign; no test email was sent and no real contact was unsubscribed to exercise it. No test-signup, contact modification, confirmation-email trigger, authentication change or Grok routine restart was performed. Website tests mock every signup request. Aggregate local scheduling evidence is retained in the ignored `_qa-output` folder; subscriber details and account receipts stay out of the public site.
 
 ## Verification and publishing
 
