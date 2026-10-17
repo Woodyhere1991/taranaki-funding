@@ -22,9 +22,15 @@ GitHub Pages publishes `main:/` to https://nzgrants.org. Old Cursor branches are
 
 Keep Grok's paused routines paused. Use a single weekly verification/drafting pass instead of repeated background reviews. No new tracking or recurring jobs were enabled by these repairs.
 
-## Outstanding account checks (17 October 2026)
+## Brevo verification (17 October 2026)
 
-No Brevo credentials exist in this checkout and no Brevo connector was found. Final campaigns, the Manawatu draft, regional list mapping, double opt-in configuration, sender authentication, unsubscribe rendering and Monday scheduling remain unverified. These require authenticated account access. Website tests mock every signup request; no live contact was created and no confirmation email was triggered.
+The owner signed in to the newsletter account `nzfundinglist@gmail.com` in Chrome. The separate default Google sign-in account does not contain these newsletter forms or campaigns; confirm the account identity before editing. No credentials are stored in this checkout.
+
+All three existing forms use double confirmation and their matching regional lists: Taranaki list #4, Whanganui #5, Manawatu #6. Confirmation templates #5/#6/#7 contain the correct regional names, sender, subject and `{{ doubleoptin }}` link even though #6/#7 have old internal copy names. Submission and validation redirects point to each region's thank-you page. `nzgrants.org` is authenticated; the three `news@nzgrants.org` senders are verified and show configured DMARC. Account time zone is Auckland.
+
+The account had no newsletter campaigns before this repair. Prepared and saved two **unsent, unscheduled owner-review drafts** from the corrected source: [Taranaki #8](https://app.brevo.com/marketing-campaign/edit/8) and [Whanganui #9](https://app.brevo.com/marketing-campaign/edit/9). Each uses its own regional sender and list, a `{{ unsubscribe }}` hyperlink, and `nzfundinglist@gmail.com` as the Reply-to address for manual unsubscribe requests. Do not create duplicates if these draft IDs already exist.
+
+Still required: retrieve the existing Manawatu issue (absent from GitHub and Brevo), review all final content and audiences with the owner, then obtain explicit send/schedule approval and record the actual saved schedule. The unsubscribe placeholder is present in the saved draft previews; replacement in a real delivered email has not been tested. No send, schedule, test-signup, contact modification, confirmation-email trigger, authentication change or Grok routine restart was performed. Website tests mock every signup request.
 
 ## Verification and publishing
 
