@@ -152,7 +152,7 @@ const root = path.resolve(__dirname, '..');
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
       checks++;
     }
-    for (const region of ['taranaki', 'whanganui']) {
+    for (const region of regions) {
       await page.goto(`${base}/${region}/sample.html`);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
       assert.match(await page.locator('[data-unsubscribe-request]').getAttribute('href'), /^mailto:nzfundinglist@gmail.com\?subject=UNSUBSCRIBE/);
@@ -164,8 +164,8 @@ const root = path.resolve(__dirname, '..');
       await page.waitForURL(base + target + '?source=old#keep'); checks++;
     }
     await fs.mkdir(path.join(root, '_qa-output'), { recursive: true });
-    await page.goto(base + '/whanganui/sample.html');
-    await page.screenshot({ path: path.join(root, '_qa-output', 'whanganui-mobile.png'), fullPage: true });
+    await page.goto(base + '/manawatu/sample.html');
+    await page.screenshot({ path: path.join(root, '_qa-output', 'manawatu-mobile.png'), fullPage: true });
     await context.close();
     console.log(`PASS: ${checks} browser scenarios; external requests intercepted, no live signup or email.`);
   } finally {

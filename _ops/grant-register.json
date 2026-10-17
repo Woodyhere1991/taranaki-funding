@@ -178,9 +178,72 @@
       "last_checked": "2026-10-17",
       "verification": "published_date_and_key_conditions_checked",
       "recheck_before_each_issue": true
+    },
+    {
+      "region": "manawatu",
+      "fund": "Grassroots Trust Central",
+      "source": "https://www.grassrootstrustcentral.co.nz/apply-for-a-grant/",
+      "sample": "manawatu/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true
+    },
+    {
+      "region": "manawatu",
+      "fund": "Grassroots Trust Central venue map",
+      "source": "https://www.grassrootstrustcentral.co.nz/our-venues/venue-map/",
+      "sample": "manawatu/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true
+    },
+    {
+      "region": "manawatu",
+      "fund": "Pub Charity",
+      "source": "https://www.pubcharitylimited.org.nz/grants/deadlines",
+      "sample": "manawatu/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true
+    },
+    {
+      "region": "manawatu",
+      "fund": "NZCT",
+      "source": "https://www.nzct.org.nz/faqs",
+      "sample": "manawatu/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true
+    },
+    {
+      "region": "manawatu",
+      "fund": "The Lion Foundation",
+      "source": "https://lionfoundation.nz/step-1-before-you-apply/",
+      "sample": "manawatu/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true
+    },
+    {
+      "region": "manawatu",
+      "fund": "Lottery Fund (DIA), 2026/27 round 3",
+      "source": "https://www.communitymatters.govt.nz/important-dia-funding-dates",
+      "sample": "manawatu/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true
+    },
+    {
+      "region": "manawatu",
+      "fund": "Manawatu District Creative Communities Scheme",
+      "source": "https://www.mdc.govt.nz/services/community-funding/creative-communities-scheme",
+      "sample": "manawatu/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true
     }
   ],
-  "missing_regions": {
-    "manawatu": "Existing draft not available in this repository. Do not fabricate or replace it."
+  "issue_provenance": {
+    "manawatu": "Replacement issue rebuilt on 17 October from current primary sources after the original remote Grok issue could not be retrieved. Saved local review notes informed venue/geography checks. Not a recovered copy of the original."
   }
 }
