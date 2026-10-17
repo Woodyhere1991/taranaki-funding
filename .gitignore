@@ -1,0 +1,5 @@
+_campaign-build/
+_qa-output/
+.env
+.env.*
+node_modules/

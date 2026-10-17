@@ -1,0 +1,186 @@
+{
+  "issue_date": "2026-10-19",
+  "checked_on": "2026-10-17",
+  "purpose": "Source verification register, not a live grant database or proof of eligibility. Recheck sources before publishing the next issue.",
+  "entries": [
+    {
+      "region": "taranaki",
+      "fund": "NPDC Creative Communities Scheme",
+      "source": "https://www.npdc.govt.nz/community/community-development/funding-and-grants/creative-communities-scheme/",
+      "sample": "taranaki/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true
+    },
+    {
+      "region": "taranaki",
+      "fund": "Sport NZ Rural Travel Fund (Stratford)",
+      "source": "https://www.stratford.govt.nz/our-district/funding-and-grants/sport-new-zealand-rural-travel-fund",
+      "sample": "taranaki/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true
+    },
+    {
+      "region": "taranaki",
+      "fund": "Toi Foundation, Strengthening Community Fund",
+      "source": "https://toifoundation.org.nz/how-we-fund/important-information/",
+      "sample": "taranaki/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true
+    },
+    {
+      "region": "taranaki",
+      "fund": "Grassroots Trust Central",
+      "source": "https://www.grassrootstrustcentral.co.nz/apply-for-a-grant/",
+      "sample": "taranaki/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true,
+      "notes": "31 October for November meeting; 25 November for December meeting. Sample asks readers to check the current venue list and funding area; it does not assert a specific venue mapping."
+    },
+    {
+      "region": "taranaki",
+      "fund": "Pub Charity",
+      "source": "https://www.pubcharitylimited.org.nz/grants/deadlines",
+      "sample": "taranaki/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true
+    },
+    {
+      "region": "taranaki",
+      "fund": "NZCT",
+      "source": "https://www.nzct.org.nz/faqs",
+      "sample": "taranaki/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true
+    },
+    {
+      "region": "taranaki",
+      "fund": "The Lion Foundation",
+      "source": "https://lionfoundation.nz/step-1-before-you-apply/",
+      "sample": "taranaki/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true
+    },
+    {
+      "region": "taranaki",
+      "fund": "NPDC Rural Halls Grant",
+      "source": "https://newplymouthnz.smartygrants.com.au/RuralHalls",
+      "sample": "taranaki/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true
+    },
+    {
+      "region": "taranaki",
+      "fund": "Lottery Fund round 3",
+      "source": "https://www.communitymatters.govt.nz/important-dia-funding-dates",
+      "sample": "taranaki/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true
+    },
+    {
+      "region": "whanganui",
+      "fund": "Four Winds Foundation (monthly)",
+      "source": "https://www.fourwindsfoundation.co.nz/grants/apply-here/",
+      "sample": "whanganui/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "source_conflict_caution_published",
+      "recheck_before_each_issue": true,
+      "notes": "Official page says both last working day and 25th. Detailed October schedule says 25 October. Confirm with funder; do not claim the conflict is resolved."
+    },
+    {
+      "region": "whanganui",
+      "fund": "Whanganui Community Foundation, Community Support Grants ($10,001 to $100,000)",
+      "source": "https://whanganuicommunityfoundation.org.nz/funding/grant-types/",
+      "sample": "whanganui/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true,
+      "notes": "Annual application limit applies to both Quick Response and Community Support grants. Closing dates checked; see board schedule for decision date."
+    },
+    {
+      "region": "whanganui",
+      "fund": "Whanganui District Council, Heritage Grant Fund",
+      "source": "https://www.whanganui.govt.nz/Community-and-Places/Funding-Opportunities/Heritage-Grant-Fund",
+      "sample": "whanganui/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true,
+      "notes": "31 October 2026 verified on official Council page; direct requests intermittently receive 403. Building criteria include exceptions; use official page."
+    },
+    {
+      "region": "whanganui",
+      "fund": "Whanganui Community Foundation, Quick Response Grants (up to $10,000)",
+      "source": "https://whanganuicommunityfoundation.org.nz/funding/grant-types/",
+      "sample": "whanganui/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true,
+      "notes": "Annual application limit applies to both Quick Response and Community Support grants. Closing dates checked; see board schedule for decision date."
+    },
+    {
+      "region": "whanganui",
+      "fund": "Pub Charity",
+      "source": "https://www.pubcharitylimited.org.nz/grants/deadlines",
+      "sample": "whanganui/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true
+    },
+    {
+      "region": "whanganui",
+      "fund": "Lottery Fund (DIA), 2026/27 round 3",
+      "source": "https://www.communitymatters.govt.nz/important-dia-funding-dates/",
+      "sample": "whanganui/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true
+    },
+    {
+      "region": "whanganui",
+      "fund": "WDC Creative Communities Scheme",
+      "source": "https://www.whanganui.govt.nz/Community-and-Places/Funding-Opportunities/Creative-Communities-Scheme",
+      "sample": "whanganui/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true
+    },
+    {
+      "region": "whanganui",
+      "fund": "WDC Sport and Recreation Facilities Fund",
+      "source": "https://www.whanganui.govt.nz/Community-and-Places/Funding-Opportunities/Sport-and-Recreation-Facilities-Fund",
+      "sample": "whanganui/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true
+    },
+    {
+      "region": "whanganui",
+      "fund": "NZCT",
+      "source": "https://www.nzct.org.nz/faqs",
+      "sample": "whanganui/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true
+    },
+    {
+      "region": "whanganui",
+      "fund": "WDC Rural Community Grant Fund (up to $1,000)",
+      "source": "https://www.whanganui.govt.nz/Community-and-Places/Funding-Opportunities/Rural-Community-Grant-Fund",
+      "sample": "whanganui/sample.html",
+      "last_checked": "2026-10-17",
+      "verification": "published_date_and_key_conditions_checked",
+      "recheck_before_each_issue": true
+    }
+  ],
+  "missing_regions": {
+    "manawatu": "Existing draft not available in this repository. Do not fabricate or replace it."
+  }
+}
