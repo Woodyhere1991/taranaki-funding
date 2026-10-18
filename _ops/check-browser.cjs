@@ -153,6 +153,16 @@ const root = path.resolve(__dirname, '..');
       checks++;
     }
     for (const region of regions) {
+      await page.goto(`${base}/${region}/thank-you.html`);
+      assert.match(await page.locator('h1').innerText(), /check your email/i);
+      await page.goto(`${base}/${region}/confirmed.html`);
+      assert.equal(await page.locator('h1').innerText(), "You're subscribed");
+      assert.match(await page.locator('body').innerText(), /do not need to sign up or confirm again/);
+      assert.equal(await page.locator('a.share').getAttribute('href'), `https://nzgrants.org/share/?r=${region}`);
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+      checks++;
+    }
+    for (const region of regions) {
       await page.goto(`${base}/${region}/sample.html`);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
       assert.match(await page.locator('[data-unsubscribe-request]').getAttribute('href'), /^mailto:nzfundinglist@gmail.com\?subject=UNSUBSCRIBE/);
