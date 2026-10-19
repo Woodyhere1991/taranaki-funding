@@ -88,12 +88,12 @@
     {
       "region": "whanganui",
       "fund": "Four Winds Foundation (monthly)",
-      "source": "https://www.fourwindsfoundation.co.nz/grants/apply-here/",
+      "source": "https://www.fourwindsfoundation.co.nz/who-we-are/find-a-venue/",
       "sample": "whanganui/sample.html",
-      "last_checked": "2026-10-17",
-      "verification": "source_conflict_caution_published",
+      "last_checked": "2026-10-19",
+      "verification": "not_applicable",
       "recheck_before_each_issue": true,
-      "notes": "Official page says both last working day and 25th. Detailed October schedule says 25 October. Confirm with funder; do not claim the conflict is resolved."
+      "notes": "No Four Winds venue in the region. Checked 19 Oct 2026 against https://www.fourwindsfoundation.co.nz/who-we-are/find-a-venue/"
     },
     {
       "region": "whanganui",
@@ -178,6 +178,16 @@
       "last_checked": "2026-10-17",
       "verification": "published_date_and_key_conditions_checked",
       "recheck_before_each_issue": true
+    },
+    {
+      "region": "manawatu",
+      "fund": "Four Winds Foundation (monthly)",
+      "source": "https://www.fourwindsfoundation.co.nz/who-we-are/find-a-venue/",
+      "sample": "manawatu/sample.html",
+      "last_checked": "2026-10-19",
+      "verification": "not_applicable",
+      "recheck_before_each_issue": true,
+      "notes": "No Four Winds venue in the region. Checked 19 Oct 2026 against https://www.fourwindsfoundation.co.nz/who-we-are/find-a-venue/"
     },
     {
       "region": "manawatu",
