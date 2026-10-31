@@ -9,8 +9,9 @@
   var consent = form.querySelector('input[type="checkbox"]');
   var readyLabel = button.textContent;
   var pending = false;
-  var uncertainText = "We couldn't confirm your signup. Check your inbox and spam for a confirmation email before trying again. Your email is still here. If needed, email nzfundinglist@gmail.com for help.";
+  var consentText = 'Please tick the box to agree before signing up.';
   var failText = 'Your signup was not accepted. Please try again, or email nzfundinglist@gmail.com for help.';
+  var transportText = "Sorry, your signup didn't go through. Please try again, or open nzgrants.org in Safari or Chrome. If it still fails, email nzfundinglist@gmail.com.";
 
   function brevoMessage(data) {
     var errors = data && data.errors;
@@ -29,11 +30,51 @@
     return parts.join(' ');
   }
 
+  function showError(message) {
+    pending = false;
+    button.disabled = false;
+    button.textContent = readyLabel;
+    form.removeAttribute('aria-busy');
+    errorEl.textContent = message;
+  }
+
+  // HTMLFormElement.submit() does not fire submit, so the fetch handler cannot run again.
+  function nativeSubmit() {
+    if (form.getAttribute('data-native-submit') === '1') return;
+    if (!form.action || String(form.method).toLowerCase() !== 'post') {
+      showError(transportText);
+      return;
+    }
+    form.setAttribute('data-native-submit', '1');
+    button.disabled = true;
+    form.setAttribute('aria-busy', 'true');
+    try {
+      form.submit();
+    } catch (err) {
+      form.removeAttribute('data-native-submit');
+      showError(transportText);
+    }
+  }
+
+  consent.addEventListener('change', function () {
+    if (consent.checked && errorEl.textContent === consentText) errorEl.textContent = '';
+  });
+
+  // The checkbox is required, so an ordinary click never fires submit while it is unticked.
+  button.addEventListener('click', function (event) {
+    if (consent.checked) return;
+    event.preventDefault();
+    errorEl.textContent = consentText;
+    consent.focus();
+  });
+
   form.addEventListener('submit', function (event) {
+    if (form.getAttribute('data-native-submit') === '1') return;
     event.preventDefault();
     if (pending) return;
     errorEl.textContent = '';
     if (!consent.checked) {
+      errorEl.textContent = consentText;
       consent.focus();
       return;
     }
@@ -47,70 +88,67 @@
     button.textContent = 'Signing you up...';
     form.setAttribute('aria-busy', 'true');
     var settled = false;
+    // Some iOS in-app browsers abort or stall a cross-origin fetch, especially with AbortSignal.
     var controller = typeof AbortController === 'function' ? new AbortController() : null;
     var timer;
 
-    function fail(message) {
+    function fallback() {
       if (settled) return;
       settled = true;
       window.clearTimeout(timer);
-      pending = false;
-      button.disabled = false;
-      button.textContent = readyLabel;
-      form.removeAttribute('aria-busy');
-      errorEl.textContent = message;
+      if (controller) {
+        try { controller.abort(); } catch (ignore) {}
+      }
+      nativeSubmit();
     }
 
-    // The server may have accepted a timed-out request. Never replay it automatically.
-    timer = window.setTimeout(function () {
-      fail(uncertainText);
-      if (controller) controller.abort();
-    }, 15000);
+    timer = window.setTimeout(fallback, 15000);
 
     var params = new URLSearchParams();
     Array.prototype.forEach.call(form.elements, function (el) {
       if (!el.name || el.type === 'checkbox' || el.type === 'submit' || el.type === 'button') return;
       params.append(el.name, el.value);
     });
+    // Leave Content-Type to URLSearchParams so this stays a simple CORS request (no preflight).
     var endpoint = form.action + (form.action.indexOf('?') === -1 ? '?' : '&') + 'isAjax=1';
+    var fetchOptions = {
+      method: 'POST',
+      mode: 'cors',
+      credentials: 'omit',
+      redirect: 'error',
+      headers: { 'Accept': 'application/json' },
+      body: params
+    };
+    if (controller) fetchOptions.signal = controller.signal;
 
-    (async function () {
-      try {
-        var response = await fetch(endpoint, {
-          method: 'POST',
-          mode: 'cors',
-          redirect: 'error',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: params,
-          signal: controller ? controller.signal : undefined
-        });
+    fetch(endpoint, fetchOptions).then(function (response) {
+      if (settled) return;
+      return response.text().then(function (text) {
         if (settled) return;
-        if (response.redirected || response.type === 'opaqueredirect') {
-          fail(uncertainText);
-          return;
-        }
         var data;
         try {
-          data = JSON.parse(await response.text());
+          data = JSON.parse(text);
         } catch (err) {
-          fail(uncertainText);
+          fallback();
           return;
         }
         if (settled) return;
-        // Brevo's AJAX form response must explicitly acknowledge success.
         if (response.ok && data && data.success === true) {
           settled = true;
           window.clearTimeout(timer);
           window.location.assign('thank-you.html');
           return;
         }
-        fail(data && data.success === false ? (brevoMessage(data) || failText) : uncertainText);
-      } catch (err) {
-        fail(uncertainText);
-      }
-    })();
+        if (data && data.success === false) {
+          settled = true;
+          window.clearTimeout(timer);
+          showError(brevoMessage(data) || failText);
+          return;
+        }
+        fallback();
+      });
+    }).catch(function () {
+      fallback();
+    });
   });
 })();
