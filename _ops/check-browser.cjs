@@ -24,6 +24,8 @@ const root = path.resolve(__dirname, '..');
   let checks = 0;
   const regions = ['taranaki', 'whanganui', 'manawatu'];
 
+  let expectedOrganisation = null;
+
   function describeRequest(req) {
     const url = new URL(req.url());
     const body = new URLSearchParams(req.postData() || '');
@@ -31,15 +33,25 @@ const root = path.resolve(__dirname, '..');
       isAjax: url.searchParams.get('isAjax') === '1',
       email: body.get('EMAIL'),
       locale: body.get('locale'),
-      honeypot: body.get('email_address_check')
+      honeypot: body.get('email_address_check'),
+      organisation: body.has('ORGANISATION') ? body.get('ORGANISATION') : null,
+      keys: Array.from(body.keys()).sort()
     };
+  }
+
+  function assertPayload(entry) {
+    assert.equal(entry.email, 'test@example.invalid');
+    assert.equal(entry.locale, 'en');
+    assert.equal(entry.honeypot, '');
+    assert.equal(entry.organisation, expectedOrganisation);
+    const keys = ['EMAIL', 'email_address_check', 'locale'];
+    if (expectedOrganisation !== null) keys.push('ORGANISATION');
+    assert.deepEqual(entry.keys, keys.sort());
   }
 
   function assertNative(entry) {
     assert.equal(entry.isAjax, false);
-    assert.equal(entry.email, 'test@example.invalid');
-    assert.equal(entry.locale, 'en');
-    assert.equal(entry.honeypot, '');
+    assertPayload(entry);
   }
 
   try {
@@ -58,7 +70,7 @@ const root = path.resolve(__dirname, '..');
           assert.match(req.url(), /^https:\/\/37afba3a\.sibforms\.com\/serve\//);
           assert.equal(req.method(), 'POST');
           const entry = describeRequest(req);
-          assert.equal(entry.email, 'test@example.invalid');
+          assertPayload(entry);
           requests.push(entry);
           if (!entry.isAjax) {
             assertNative(entry);
@@ -71,13 +83,20 @@ const root = path.resolve(__dirname, '..');
           }
           await handler(route, requests.length);
         });
+        expectedOrganisation = null;
         await page.goto(`${base}/${region}/`);
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
         assert.equal((await page.locator('#signup').getAttribute('method')).toLowerCase(), 'post');
         assert.match(await page.locator('#signup').getAttribute('action'), /^https:\/\/37afba3a\.sibforms\.com\/serve\//);
-        assert.match(await page.locator('script[src*="signup.js"]').getAttribute('src'), /signup\.js\?v=20261031$/);
+        assert.match(await page.locator('script[src*="signup.js"]').getAttribute('src'), /signup\.js\?v=20261107$/);
         const names = await page.locator('#signup [name]').evaluateAll(els => els.map(el => el.getAttribute('name')).sort());
-        assert.deepEqual(names, ['EMAIL', 'email_address_check', 'locale']);
+        assert.deepEqual(names, ['EMAIL', 'ORGANISATION', 'email_address_check', 'locale']);
+        assert.equal(await page.locator('label[for="organisation"]').innerText(), 'Your group or organisation (optional)');
+        assert.equal(await page.locator('#organisation').getAttribute('required'), null);
+        assert.equal(await page.locator('#organisation').getAttribute('maxlength'), '200');
+        assert.equal(await page.locator('#email').getAttribute('name'), 'EMAIL');
+        assert.equal(await page.locator('input[name="email_address_check"]').count(), 1);
+        assert.equal(await page.locator('#signup input[type="checkbox"]').getAttribute('name'), null);
         await page.locator('#email').fill('test@example.invalid');
         await page.locator('input[type=checkbox]').check();
         return { context, page, requests, jsErrors };
@@ -135,7 +154,45 @@ const root = path.resolve(__dirname, '..');
           await page.waitForURL(`${base}/${region}/thank-you.html`);
           assert.equal(requests.length, 1);
           assert.equal(requests[0].isAjax, true);
+          assert.equal(requests[0].organisation, null);
           assert.deepEqual(jsErrors, []);
+          await context.close(); checks++;
+        }
+        {
+          const { page, context, requests, jsErrors } = await setup(region, reply(200, '{"success":true}'));
+          expectedOrganisation = 'Manawatū Club';
+          await page.locator('#organisation').fill('Manawatū Club');
+          await page.locator('button[type=submit]').click();
+          await page.waitForURL(`${base}/${region}/thank-you.html`);
+          assert.equal(requests.length, 1);
+          assert.equal(requests[0].isAjax, true);
+          assert.equal(requests[0].organisation, 'Manawatū Club');
+          assert.deepEqual(jsErrors, []);
+          await context.close(); checks++;
+        }
+        {
+          const { page, context, requests } = await setup(region, reply(200, '{"success":true}'));
+          await page.locator('#organisation').fill('Manawatū Club');
+          await page.locator('#organisation').fill('');
+          await page.locator('button[type=submit]').click();
+          await page.waitForURL(`${base}/${region}/thank-you.html`);
+          assert.equal(requests.length, 1);
+          assert.equal(requests[0].isAjax, true);
+          assert.equal(requests[0].organisation, null);
+          await context.close(); checks++;
+        }
+        {
+          const { page, context, requests } = await setup(region, reply(200, '{"success":true}'));
+          expectedOrganisation = 'Manawatū Club';
+          await page.locator('#organisation').fill('Manawatū Club');
+          await page.evaluate(() => {
+            window.fetch = function () { return Promise.reject(new TypeError('Load failed')); };
+          });
+          await page.locator('button[type=submit]').click();
+          await waitForNativePost(page, region);
+          assert.equal(requests.length, 1, engineName + ' filled organisation uses one native POST');
+          assert.equal(requests[0].isAjax, false);
+          assert.equal(requests[0].organisation, 'Manawatū Club');
           await context.close(); checks++;
         }
         for (const noAbortController of [false, true]) {
