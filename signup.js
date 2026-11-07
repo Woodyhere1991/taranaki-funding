@@ -38,6 +38,14 @@
     errorEl.textContent = message;
   }
 
+  // Blank organisation is not a named control, so the POST body stays EMAIL, the honeypot and locale.
+  function prepareOrganisation() {
+    var org = document.getElementById('organisation');
+    if (!org) return;
+    if (org.value === '') org.removeAttribute('name');
+    else org.setAttribute('name', 'ORGANISATION');
+  }
+
   // HTMLFormElement.submit() does not fire submit, so the fetch handler cannot run again.
   function nativeSubmit() {
     if (form.getAttribute('data-native-submit') === '1') return;
@@ -45,6 +53,7 @@
       showError(transportText);
       return;
     }
+    prepareOrganisation();
     form.setAttribute('data-native-submit', '1');
     button.disabled = true;
     form.setAttribute('aria-busy', 'true');
@@ -104,9 +113,11 @@
 
     timer = window.setTimeout(fallback, 15000);
 
+    prepareOrganisation();
     var params = new URLSearchParams();
     Array.prototype.forEach.call(form.elements, function (el) {
       if (!el.name || el.type === 'checkbox' || el.type === 'submit' || el.type === 'button') return;
+      if (el.name === 'ORGANISATION' && el.value === '') return;
       params.append(el.name, el.value);
     });
     // Leave Content-Type to URLSearchParams so this stays a simple CORS request (no preflight).
