@@ -163,3 +163,38 @@
     });
   });
 })();
+
+(function () {
+  var el = document.getElementById('join-count');
+  if (!el) return;
+  var region = el.getAttribute('data-region');
+  var names = {
+    taranaki: 'Taranaki Funding',
+    whanganui: 'Whanganui Funding',
+    manawatu: 'Manawatū Funding'
+  };
+  var label = names[region];
+  if (!label) return;
+  function ready() {
+    el.setAttribute('data-ready', '1');
+  }
+  fetch('https://nzgrants-counts.nakiwreckremoval.workers.dev/', {
+    method: 'GET',
+    mode: 'cors',
+    credentials: 'omit'
+  }).then(function (response) {
+    if (!response.ok) return null;
+    return response.json();
+  }).then(function (data) {
+    var count = data && data[region];
+    if (typeof count !== 'number' || count < 1 || count !== Math.floor(count)) {
+      ready();
+      return;
+    }
+    el.textContent = count + ' groups have joined ' + label + ' so far';
+    el.removeAttribute('hidden');
+    ready();
+  }).catch(function () {
+    ready();
+  });
+})();

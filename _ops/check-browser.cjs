@@ -25,6 +25,8 @@ const root = path.resolve(__dirname, '..');
   const regions = ['taranaki', 'whanganui', 'manawatu'];
 
   let expectedOrganisation = null;
+  let countsHandler = null;
+  let countsStatus = 0;
 
   function describeRequest(req) {
     const url = new URL(req.url());
@@ -66,7 +68,14 @@ const root = path.resolve(__dirname, '..');
         await context.route('**/*', async route => {
           const req = route.request();
           if (req.url().startsWith(base + '/')) return route.continue();
-          // Every external request is intercepted. Never create a production signup.
+          if (/^https:\/\/nzgrants-counts\.nakiwreckremoval\.workers\.dev\/?$/.test(req.url())) {
+            assert.equal(req.method(), 'GET');
+            const body = countsHandler ? countsHandler() : JSON.stringify({ taranaki: 34, whanganui: 19, manawatu: 13 });
+            const status = countsStatus || 200;
+            await route.fulfill({ status, contentType: 'application/json', headers: { 'Access-Control-Allow-Origin': '*' }, body });
+            return;
+          }
+          // Every other external request is intercepted. Never create a production signup.
           assert.match(req.url(), /^https:\/\/37afba3a\.sibforms\.com\/serve\//);
           assert.equal(req.method(), 'POST');
           const entry = describeRequest(req);
@@ -86,9 +95,18 @@ const root = path.resolve(__dirname, '..');
         expectedOrganisation = null;
         await page.goto(`${base}/${region}/`);
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+        const labels = { taranaki: 'Taranaki Funding', whanganui: 'Whanganui Funding', manawatu: 'Manawatū Funding' };
+        if (!countsHandler && !countsStatus) {
+          await page.waitForFunction(() => {
+            const el = document.getElementById('join-count');
+            return el && el.getAttribute('data-ready') === '1' && !el.hasAttribute('hidden') && el.textContent.includes('groups have joined');
+          });
+          const counts = { taranaki: 34, whanganui: 19, manawatu: 13 };
+          assert.equal(await page.locator('#join-count').innerText(), `${counts[region]} groups have joined ${labels[region]} so far`);
+        }
         assert.equal((await page.locator('#signup').getAttribute('method')).toLowerCase(), 'post');
         assert.match(await page.locator('#signup').getAttribute('action'), /^https:\/\/37afba3a\.sibforms\.com\/serve\//);
-        assert.match(await page.locator('script[src*="signup.js"]').getAttribute('src'), /signup\.js\?v=20261107$/);
+        assert.match(await page.locator('script[src*="signup.js"]').getAttribute('src'), /signup\.js\?v=20261110$/);
         const names = await page.locator('#signup [name]').evaluateAll(els => els.map(el => el.getAttribute('name')).sort());
         assert.deepEqual(names, ['EMAIL', 'ORGANISATION', 'email_address_check', 'locale']);
         assert.equal(await page.locator('label[for="organisation"]').innerText(), 'Your group or organisation (optional)');
@@ -243,6 +261,23 @@ const root = path.resolve(__dirname, '..');
           await page.locator('#email').fill('invalid');
           await page.locator('#signup').evaluate(form => form.dispatchEvent(new Event('submit', { cancelable: true })));
           assert.equal(requests.length, 0);
+          await context.close(); checks++;
+        }
+        {
+          countsStatus = 500;
+          const { page, context, requests, jsErrors } = await setup(region, reply(200, '{"success":true}'));
+          countsStatus = 0;
+          await page.waitForFunction(() => {
+            const el = document.getElementById('join-count');
+            return el && el.getAttribute('data-ready') === '1';
+          });
+          assert.equal(await page.locator('#join-count').getAttribute('hidden'), '');
+          assert.equal(await page.locator('#join-count').innerText(), '');
+          await page.locator('button[type=submit]').click();
+          await page.waitForURL(`${base}/${region}/thank-you.html`);
+          assert.equal(requests.length, 1);
+          assert.equal(requests[0].isAjax, true);
+          assert.deepEqual(jsErrors, []);
           await context.close(); checks++;
         }
       }
