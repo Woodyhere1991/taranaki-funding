@@ -7,15 +7,17 @@ GitHub Pages publishes `main:/` to https://nzgrants.org. Old Cursor branches are
 
 - Regional `index.html`: signup content and the existing public Brevo form endpoint. Preserve the endpoint-to-region mapping.
 - `signup.js`: shared submission handling for all three regions. Accept only HTTP success with JSON `success: true`. Timeout includes the response body; never retry a POST automatically. Uncertain outcomes ask the subscriber to check their inbox first.
-- Regional `sample.html`: canonical published issue content. Keep these updated rather than creating separate editable website/email copies.
+- Regional `sample.html`: public website preview only. Never use these pages to build a Brevo campaign. Campaigns come from the QA-passed issue files.
 - `_ops/grant-register.json`: source, date and eligibility verification record. Recheck before each issue. A verified date does not mean every applicant is eligible.
 - Brevo: subscriber consent/confirmation, regional lists, suppression, campaign drafts, sender authentication, sending and reporting. None of that is established by a GitHub Pages deployment.
 
 ## Weekly process
 
+Newsletter campaigns are built only on the operator's box with `/workspace/funding-test/scripts/create_campaign.py`, from the QA-passed issue files. The website `sample.html` pages must never be used to build Brevo campaigns. That is how campaigns #8 to #10 ended up with the old template and a Four Winds entry. `_ops/prepare-campaigns.mjs` builds campaign HTML from regional `sample.html` pages. It must not be used for that.
+
 1. Work from current `main`; recheck the funders in the register once per issue, recording changes and contradictions. Ask the funder when dates conflict; do not invent a resolution.
-2. Update each regional sample, then run `node _ops/prepare-campaigns.mjs`. This creates ignored local `_campaign-build/taranaki.html`, `whanganui.html` and `manawatu.html` from the samples. It only writes local files.
-3. Import the generated HTML into the intended Brevo draft after confirming the account and campaign. It contains Brevo's documented `{{ unsubscribe }}` hyperlink. Public samples instead have a working mailto unsubscribe request, clearly described as manually handled. Never paste the public sample directly into a campaign.
+2. Build the newsletter campaign only on the operator's box with `/workspace/funding-test/scripts/create_campaign.py`, from the QA-passed issue files. Do not build it from the website `sample.html` pages.
+3. Confirm the Brevo account and campaign before saving. Do not import a website `sample.html` page, or HTML produced by `_ops/prepare-campaigns.mjs`, into a Brevo campaign. A campaign needs Brevo's documented `{{ unsubscribe }}` hyperlink. Public samples instead have a working mailto unsubscribe request, clearly described as manually handled.
 4. Review the complete final draft and intended regional audience with the owner; obtain explicit send/schedule approval. Do not send, schedule, replace an already scheduled campaign or resume Grok routines as part of a website release.
 5. Check Brevo's saved campaign ID, status, final content, confirmed regional recipient count (exclude suppressed/unconfirmed contacts), sender authentication, working rendered unsubscribe URL and exact Auckland send time. For this first issue, Monday is 19 October 2026 (NZDT, UTC+13). Record the actual saved receipt; a prepared draft is not a scheduled campaign.
 6. After sending, record aggregate delivered/bounced/unsubscribed/click counts. Provider acceptance is not delivery; open counts alone are not reliable readership. Keep subscriber emails and account receipts out of this public repository.

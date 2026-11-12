@@ -1,3 +1,8 @@
+/*
+Newsletter campaigns are built only on the operator's box with /workspace/funding-test/scripts/create_campaign.py, from the QA-passed issue files. The website sample.html pages must never be used to build Brevo campaigns. That is how campaigns #8 to #10 ended up with the old template and a Four Winds entry.
+
+This file builds campaign HTML from regional sample.html pages. It must not be used for that.
+*/
 // Offline preparation only: no account access, sending or scheduling.
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
