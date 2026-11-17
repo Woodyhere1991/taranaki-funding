@@ -198,3 +198,72 @@
     ready();
   });
 })();
+
+(function () {
+  var section = document.getElementById('taste');
+  if (!section) return;
+  var region = section.getAttribute('data-region');
+  if (!region || !/^(taranaki|whanganui|manawatu)$/.test(region)) return;
+  var list = document.getElementById('taste-list');
+  if (!list) return;
+
+  function readyHide() {
+    section.setAttribute('hidden', '');
+    section.setAttribute('data-ready', '1');
+  }
+
+  function isSafeUrl(value) {
+    if (typeof value !== 'string') return false;
+    var trimmed = value.trim();
+    if (!/^https:\/\//i.test(trimmed)) return false;
+    try {
+      var parsed = new URL(trimmed);
+      return parsed.protocol === 'https:';
+    } catch (err) {
+      return false;
+    }
+  }
+
+  fetch('/data/taste-' + region + '.json', {
+    method: 'GET',
+    credentials: 'omit'
+  }).then(function (response) {
+    if (!response.ok) return null;
+    return response.json();
+  }).then(function (data) {
+    var items = Array.isArray(data) ? data : null;
+    if (!items || !items.length) {
+      readyHide();
+      return;
+    }
+    list.textContent = '';
+    var shown = 0;
+    items.forEach(function (item) {
+      if (!item || typeof item.title !== 'string' || typeof item.closes !== 'string' || typeof item.url !== 'string') return;
+      var title = item.title.trim();
+      var closes = item.closes.trim();
+      var url = item.url.trim();
+      if (!title || !closes || !isSafeUrl(url)) return;
+      var p = document.createElement('p');
+      var bold = document.createElement('b');
+      bold.textContent = 'Closes ' + closes + ':';
+      p.appendChild(bold);
+      p.appendChild(document.createTextNode(' '));
+      var link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('rel', 'noopener noreferrer');
+      link.textContent = title;
+      p.appendChild(link);
+      list.appendChild(p);
+      shown += 1;
+    });
+    if (!shown) {
+      readyHide();
+      return;
+    }
+    section.removeAttribute('hidden');
+    section.setAttribute('data-ready', '1');
+  }).catch(function () {
+    readyHide();
+  });
+})();
