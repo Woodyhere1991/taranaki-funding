@@ -14,7 +14,17 @@ const root = path.resolve(__dirname, '..');
       const file = path.resolve(root, '.' + name);
       assert.ok(file.startsWith(root + path.sep));
       const body = await fs.readFile(file);
-      res.setHeader('Content-Type', file.endsWith('.js') ? 'text/javascript' : file.endsWith('.html') ? 'text/html; charset=utf-8' : 'application/octet-stream');
+      let type = 'application/octet-stream';
+      if (file.endsWith('.js')) type = 'text/javascript';
+      else if (file.endsWith('.html')) type = 'text/html; charset=utf-8';
+      else if (file.endsWith('.json')) type = 'application/json; charset=utf-8';
+      if (tasteOverride && name.indexOf('/data/taste-') === 0 && name.endsWith('.json')) {
+        res.statusCode = tasteOverride.status;
+        res.setHeader('Content-Type', tasteOverride.type || 'application/json; charset=utf-8');
+        res.end(tasteOverride.body);
+        return;
+      }
+      res.setHeader('Content-Type', type);
       res.end(body);
     } catch { res.statusCode = 404; res.end('Not found'); }
   });
@@ -27,6 +37,7 @@ const root = path.resolve(__dirname, '..');
   let expectedOrganisation = null;
   let countsHandler = null;
   let countsStatus = 0;
+  let tasteOverride = null;
 
   function describeRequest(req) {
     const url = new URL(req.url());
@@ -56,9 +67,29 @@ const root = path.resolve(__dirname, '..');
     assertPayload(entry);
   }
 
+  async function launchBrowser(engine, engineName) {
+    const options = { headless: true };
+    if (engineName === 'chromium') {
+      const chrome = process.env.PLAYWRIGHT_CHROME || '/usr/bin/google-chrome';
+      try {
+        await fs.access(chrome);
+        options.executablePath = chrome;
+      } catch (ignore) {}
+    }
+    return engine.launch(options);
+  }
+
   try {
     async function runSignup(engine, engineName) {
-      browser = await engine.launch({ headless: true });
+      try {
+        browser = await launchBrowser(engine, engineName);
+      } catch (err) {
+        if (engineName === 'webkit') {
+          console.log('SKIP signup: webkit (' + String(err.message || err).split('\n')[0] + ')');
+          return;
+        }
+        throw err;
+      }
       async function setup(region, handler) {
         const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
         const page = await context.newPage();
@@ -106,7 +137,7 @@ const root = path.resolve(__dirname, '..');
         }
         assert.equal((await page.locator('#signup').getAttribute('method')).toLowerCase(), 'post');
         assert.match(await page.locator('#signup').getAttribute('action'), /^https:\/\/37afba3a\.sibforms\.com\/serve\//);
-        assert.match(await page.locator('script[src*="signup.js"]').getAttribute('src'), /signup\.js\?v=20261110$/);
+        assert.match(await page.locator('script[src*="signup.js"]').getAttribute('src'), /signup\.js\?v=20261118$/);
         const names = await page.locator('#signup [name]').evaluateAll(els => els.map(el => el.getAttribute('name')).sort());
         assert.deepEqual(names, ['EMAIL', 'ORGANISATION', 'email_address_check', 'locale']);
         assert.equal(await page.locator('label[for="organisation"]').innerText(), 'Your group or organisation (optional)');
@@ -289,7 +320,7 @@ const root = path.resolve(__dirname, '..');
     await runSignup(chromium, 'chromium');
     await runSignup(webkit, 'webkit');
 
-    browser = await chromium.launch({ headless: true });
+    browser = await launchBrowser(chromium, 'chromium');
     const context = await browser.newContext({ viewport: { width: 320, height: 720 } });
     await context.route('**/*', route => route.request().url().startsWith(base + '/') ? route.continue() : route.abort());
     const page = await context.newPage();
@@ -302,15 +333,76 @@ const root = path.resolve(__dirname, '..');
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
       checks++;
     }
+    const regionLabels = { taranaki: 'Taranaki Funding', whanganui: 'Whanganui Funding', manawatu: 'Manawatū Funding' };
     for (const region of regions) {
       await page.goto(`${base}/${region}/thank-you.html`);
       assert.match(await page.locator('h1').innerText(), /check your email/i);
+      assert.match(await page.locator('body').innerText(), /After you confirm, your first Monday email is on its way/);
+      assert.doesNotMatch(await page.locator('body').innerText(), /Once you have confirmed your subscription/);
       await page.goto(`${base}/${region}/confirmed.html`);
       assert.equal(await page.locator('h1').innerText(), "You're in!");
+      assert.equal(await page.title(), "You're in! | " + regionLabels[region]);
       assert.match(await page.locator('body').innerText(), /Thanks for confirming\. Your first .+ Funding email will arrive next Monday morning/);
       assert.equal(await page.locator('a.share').getAttribute('href'), `https://nzgrants.org/share/?r=${region}`);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
       checks++;
+    }
+    async function waitForTaste() {
+      await page.waitForFunction(() => {
+        const el = document.getElementById('taste');
+        return el && el.getAttribute('data-ready') === '1';
+      });
+    }
+    for (const region of regions) {
+      const taste = JSON.parse(await fs.readFile(path.join(root, 'data', `taste-${region}.json`), 'utf8'));
+      await page.goto(`${base}/${region}/`);
+      await waitForTaste();
+      assert.equal(await page.locator('a[href="sample.html"]').innerText(), 'See a sample email');
+      assert.equal(await page.locator('#taste').getAttribute('hidden'), null);
+      assert.equal(await page.locator('#taste').isVisible(), true);
+      assert.equal(await page.locator('#taste-list p').count(), taste.length);
+      for (let i = 0; i < taste.length; i++) {
+        const row = page.locator('#taste-list p').nth(i);
+        assert.equal(await row.locator('b').innerText(), `Closes ${taste[i].closes}:`);
+        assert.equal(await row.locator('a').innerText(), taste[i].title);
+        assert.equal(await row.locator('a').getAttribute('href'), taste[i].url);
+      }
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+      checks++;
+    }
+    for (const region of regions) {
+      for (const [label, override] of [
+        ['missing', { status: 404, type: 'text/plain', body: 'Not found' }],
+        ['empty', { status: 200, type: 'application/json; charset=utf-8', body: '[]' }],
+        ['invalid', { status: 200, type: 'application/json; charset=utf-8', body: '{' }]
+      ]) {
+        tasteOverride = override;
+        await page.goto(`${base}/${region}/`);
+        await waitForTaste();
+        assert.equal(await page.locator('#taste').isVisible(), false, region + ' taste should hide on ' + label);
+        assert.equal(await page.locator('#taste').getAttribute('hidden'), '');
+        assert.equal(await page.locator('#taste-list p').count(), 0);
+        checks++;
+      }
+      tasteOverride = {
+        status: 200,
+        type: 'application/json; charset=utf-8',
+        body: JSON.stringify([
+          { title: '<img src=x onerror=alert(1)>Unsafe', closes: 'Mon 30 Nov', url: 'https://example.org/official' },
+          { title: 'Skip me', closes: 'Tue 1 Dec', url: 'javascript:alert(1)' },
+          { title: 'Also skip', closes: 'Wed 2 Dec', url: 'http://example.org/insecure' }
+        ])
+      };
+      await page.goto(`${base}/${region}/`);
+      await waitForTaste();
+      assert.equal(await page.locator('#taste').isVisible(), true);
+      assert.equal(await page.locator('#taste-list p').count(), 1);
+      assert.equal(await page.locator('#taste-list a').innerText(), '<img src=x onerror=alert(1)>Unsafe');
+      assert.equal(await page.locator('#taste-list img').count(), 0);
+      assert.equal(await page.locator('#taste-list script').count(), 0);
+      assert.equal(await page.locator('#taste-list a').getAttribute('href'), 'https://example.org/official');
+      checks++;
+      tasteOverride = null;
     }
     for (const region of regions) {
       await page.goto(`${base}/${region}/sample.html`);
