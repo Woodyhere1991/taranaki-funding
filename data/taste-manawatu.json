@@ -1,10 +1,5 @@
 [
   {
-    "title": "Grassroots Trust Central",
-    "closes": "11:59pm Wed 25 Nov (December meeting)",
-    "url": "https://www.grassrootstrustcentral.co.nz/apply-for-a-grant/"
-  },
-  {
     "title": "The Sargood Bequest",
     "closes": "Mon 30 Nov",
     "url": "https://www.sargoodbequest.org.nz/funding/apply-for-a-grant"
@@ -13,5 +8,10 @@
     "title": "PNCC Community Garden fund",
     "closes": "5pm Thu 31 Dec",
     "url": "https://pncc.smartygrants.com.au/"
+  },
+  {
+    "title": "ECCT Community Support & Events Fund",
+    "closes": "No closing dates (bi-monthly meetings)",
+    "url": "https://www.ecct.org.nz/funding/support-event-fund"
   }
 ]
