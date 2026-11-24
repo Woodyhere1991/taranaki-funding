@@ -224,6 +224,17 @@
     }
   }
 
+  function isDateCloses(value) {
+    // Only prefix "Closes " when the field is a date or time, not "Open all year".
+    return /^(end of\b|midnight\b|midday\b|\d{1,2}([:.]\d{2})?\s?(am|pm)\b|\d{1,2}(st|nd|rd|th)?\b|(mon|tue|wed|thu|fri|sat|sun)\b|(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b)/i.test(value);
+  }
+
+  function formatCloses(closes) {
+    if (/^closes\b/i.test(closes)) return closes + ':';
+    if (isDateCloses(closes)) return 'Closes ' + closes + ':';
+    return closes + ':';
+  }
+
   fetch('/data/taste-' + region + '.json', {
     method: 'GET',
     credentials: 'omit'
@@ -246,7 +257,7 @@
       if (!title || !closes || !isSafeUrl(url)) return;
       var p = document.createElement('p');
       var bold = document.createElement('b');
-      bold.textContent = 'Closes ' + closes + ':';
+      bold.textContent = formatCloses(closes);
       p.appendChild(bold);
       p.appendChild(document.createTextNode(' '));
       var link = document.createElement('a');
